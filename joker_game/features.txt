@@ -1,0 +1,9 @@
+- arrays of cards
+- shuffle cards
+- deal 11 cards to start each round
+- cards should include 2 jokers
+- 7 rounds
+- saying joker option
+- choose number of players 
+- choose play with computer
+

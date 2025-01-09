@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .controls {
+      margin: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #cardContainer, #playerHand {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+      min-height: 300px;
+    }
+    #cardContainer {
+      position: relative;
+      width: 200px;
+      height: 280px;
+      margin: 20px auto;
+    }
+
+    
+.dealing-card {
+      position: absolute;
+      z-index: 1000;
+      transition: all 0.5s ease;
+    }
+
+    #playerHand {
+      position: relative;
+      border: 2px dashed #ccc;
+      margin: 20px;
+      min-height: 300px;
+    }
+    .stack {
+      position: relative;
+      width: 200px;
+      height: 280px;
+      margin: 20px auto;
+    }
+    .card-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: move;
+      perspective: 1000px;
+    }
+
+    .card {
+      width: 200px;
+      height: 280px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      cursor: pointer;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden; /* Prevent image overflow */
+    }
+
+    .card-face img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Maintain aspect ratio */
+    }
+
+    .card-front {
+      background-color: white;
+      transform: rotateY(180deg);
+    }
+
+    .card-back {
+      background-color: #2c3e50;
+      transform: rotateY(0deg);
+    }
+
+    .dragging {
+      opacity: 0.5;
+    }
+    
+     /* Stack effect */
+     .card-container:nth-child(1) { transform: translateY(0); }
+    .card-container:nth-child(2) { transform: translateY(1px) translateX(1px); }
+    .card-container:nth-child(3) { transform: translateY(2px) translateX(2px); }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <button onclick="shuffleCards()">Shuffle Deck</button>
+    <button onclick="dealCards()">Deal 7 Cards</button>
+  </div>
+
+  <div id="cardContainer"></div>
+  
+  <h2>Player's Hand</h2>
+  <div id="playerHand"></div>
+
+  <script>
+    const suits = ['heart', 'spade', 'club', 'diamond'];
+    const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace'];
+    const backImages = Array.from({length: 8}, (_, i) => `./images/card_backs/back${i + 1}.jpg`);
+
+    function createDeck() {
+      const deck = [];
+      
+      // Add numbered cards
+      for (const suit of suits) {
+        for (const value of values) {
+          deck.push(`${suit}${value}`);
+        }
+      }
+      
+      // Add jokers
+      deck.push('joker1', 'joker2');
+      
+      return deck;
+    }
+
+    function createCardElement(cardName) {
+      const container = document.createElement('div');
+      container.className = 'card-container';
+      container.draggable = true;
+      
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.onclick = () => card.classList.toggle('flipped');
+      
+      const front = document.createElement('div');
+      front.className = 'card-face card-front';
+      const frontImg = document.createElement('img');
+      frontImg.src = `./images/card_fronts/${cardName}.jpg`;
+      frontImg.alt = cardName;
+      front.appendChild(frontImg);
+      
+      const back = document.createElement('div');
+      back.className = 'card-face card-back';
+      const backImg = document.createElement('img');
+      backImg.src = backImages[0];
+      backImg.alt = 'Card Back';
+      back.appendChild(backImg);
+      
+      card.appendChild(front);
+      card.appendChild(back);
+      container.appendChild(card);
+      
+      // Add drag events
+      container.addEventListener('dragstart', (e) => {
+        container.classList.add('dragging');
+      });
+      
+      container.addEventListener('dragend', (e) => {
+        container.classList.remove('dragging');
+      });
+      
+      return container;
+    }
+
+    // Initialize deck
+    let deck = createDeck();
+    const cardContainer = document.getElementById('cardContainer');
+    const playerHand = document.getElementById('playerHand');
+
+    // Add drag event listeners to containers
+    [cardContainer, playerHand].forEach(container => {
+      container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const draggable = document.querySelector('.dragging');
+        container.appendChild(draggable);
+      });
+    });
+
+    // Initial deck setup
+    function displayDeck() {
+      cardContainer.innerHTML = '';
+      // Show only top 3 cards to create stack effect
+      const displayCount = Math.min(3, deck.length);
+      for (let i = displayCount - 1; i >= 0; i--) {
+        const card = createCardElement(deck[i]);
+        cardContainer.appendChild(card);
+      }
+    }
+
+    function shuffleCards() {
+      // Shuffle array
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      
+      // Change back images and display
+      displayDeck();
+      
+      // Update back images
+      document.querySelectorAll('.card-back img').forEach(img => {
+        img.src = backImages[Math.floor(Math.random() * backImages.length)];
+      });
+    }
+
+    function dealCards() {
+      if (deck.length < 7) {
+        alert('Not enough cards in deck!');
+        return;
+      }
+      
+      // Deal 7 cards
+      for (let i = 0; i < 7; i++) {
+        const cardIndex = Math.floor(Math.random() * deck.length);
+        const card = deck.splice(cardIndex, 1)[0];
+        playerHand.appendChild(createCardElement(card));
+      }
+      
+      // Update main deck display
+      displayDeck();
+    }
+
+    // Initial display
+    displayDeck();
+  </script>
+</body>
+</html>
