@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .controls {
+      margin: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #cardContainer, #playerHand {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+      min-height: 300px;
+    }
+
+    /* Style for the individual card containers */
+    .card-container {
+      position: relative;
+      width: 200px;
+      height: 280px;
+      margin: 20px auto;
+      border-radius: 15px;  /* Rounding the corners */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);  /* Adding shadow to the cards */
+      overflow: hidden;  /* Ensure images don’t overflow the rounded edges */
+      transition: transform 0.3s ease;  /* Smooth transition when card is clicked */
+    }
+
+    .card-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;  /* Ensure the image fills the card area without stretching */
+      border-radius: 15px;  /* Matching the image with the container's rounded corners */
+    }
+
+    .card-container img.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-container:hover {
+      transform: scale(1.05);  /* Slight zoom effect when hovering */
+    }
+
+    .card-container img:hover {
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);  /* Highlight effect on hover */
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <button onclick="shuffleDeck()">Shuffle Deck</button>
+    <button onclick="dealCards()">Deal 7 Cards</button>
+  </div>
+
+  <div id="cardContainer"></div>
+
+  <h2>Player's Hand</h2>
+  <div id="playerHand"></div>
+
+  <script>
+    async function shuffleDeck() {
+      const response = await fetch('/shuffle_deck');
+      const result = await response.json();
+      console.log(result.status);
+    }
+
+    async function dealCards() {
+      const response = await fetch('/deal_cards');
+      const data = await response.json();
+      const hand = data.hand;
+      const playerHand = document.getElementById('playerHand');
+      playerHand.innerHTML = ''; // Clear current hand
+      hand.forEach(card => {
+        const cardElement = createCardElement(card.card, card.image);
+        playerHand.appendChild(cardElement);
+      });
+    }
+
+    function createCardElement(cardName, imageSrc) {
+      const container = document.createElement('div');
+      container.className = 'card-container';
+
+      const img = document.createElement('img');
+      img.src = imageSrc;
+      img.alt = cardName;
+
+      container.appendChild(img);
+      container.onclick = () => img.classList.toggle('flipped');  // Flip the card on click
+
+      return container;
+    }
+  </script>
+</body>
+</html>

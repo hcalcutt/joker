@@ -1,173 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <style>
-    .controls {
-      margin: 20px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: #2980b9;
-    }
-
-    #cardContainer {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .card-container {
-      display: inline-block;
-      perspective: 1000px;
-      margin: 10px;
-    }
-
-    .card {
-      width: 200px;
-      height: 280px;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.6s;
-      cursor: pointer;
-    }
-
-    .card.flipped {
-      transform: rotateY(180deg);
-    }
-
-    .card-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-
-    .card-front {
-      background-color: white;
-      transform: rotateY(180deg);
-    }
-
-    .card-back {
-      background-color: #2c3e50;
-      transform: rotateY(0deg);
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 10px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Card Flip</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="controls">
     <button onclick="shuffleCards()">Shuffle Cards</button>
   </div>
 
-  <div id="cardContainer">
-    <div class="card-container">
-      <div class="card" onclick="flipCard(this)">
-        <div class="card-face card-front">
-          <img src="./images/card_fronts/hearts5.jpg" alt="Heart 5">
-        </div>
-        <div class="card-face card-back">
-          <img src="./images/card_backs/back1.jpg" alt="Card Back">
-        </div>
-      </div>
-    </div>
+  <div id="cardContainer"></div>
 
-    <div class="card-container">
-      <div class="card" onclick="flipCard(this)">
-        <div class="card-face card-front">
-          <img src="./images/card_fronts/joker.jpg" alt="Joker">
-        </div>
-        <div class="card-face card-back">
-          <img src="./images/card_backs/back1.jpg" alt="Card Back">
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="card-container">
-    <div class="card" onclick="flipCard(this)">
-      <div class="card-face card-front">
-        <img src="./images/card_fronts/joker.jpg" alt="Joker">
-      </div>
-      <div class="card-face card-back">
-        <img src="./images/card_backs/back1.jpg" alt="Card Back">
-      </div>
-    </div>
-  </div>
-</div>
-
-  <script>
-    // Array of available back images
-    const backImages = [
-      './images/card_backs/back1.jpg',
-      './images/card_backs/back2.jpg',
-      './images/card_backs/back3.jpg',
-      './images/card_backs/back4.jpg',
-      './images/card_backs/back5.jpg',
-      './images/card_backs/back6.jpg',
-      './images/card_backs/back7.jpg',  
-      './images/card_backs/back8.jpg'
-     
-    ];
-
-    function flipCard(card) {
-      card.classList.toggle('flipped');
-    }
-
-    function shuffleCards() {
-      const container = document.getElementById('cardContainer');
-      const cards = Array.from(container.children);
-      
-      // Reset any flipped cards
-      cards.forEach(cardContainer => {
-        const card = cardContainer.querySelector('.card');
-        if (card.classList.contains('flipped')) {
-          card.classList.remove('flipped');
-        }
-      });
-
-      // Shuffle positions
-      for (let i = cards.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        container.appendChild(cards[j]);
-      }
-
-      // Change back images
-      cards.forEach(cardContainer => {
-        const backImage = cardContainer.querySelector('.card-back img');
-        const randomBackImage = backImages[Math.floor(Math.random() * backImages.length)];
-        backImage.src = randomBackImage;
-      });
-
-      // Add a shuffle animation
-      cards.forEach(card => {
-        card.style.transform = 'scale(1.1)';
-        setTimeout(() => {
-          card.style.transform = 'scale(1)';
-        }, 200);
-      });
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
